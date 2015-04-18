@@ -30,11 +30,15 @@ ADD supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /etc/supervisor/conf.d
 ADD elk.conf /etc/supervisor/conf.d/elk.conf
 
+RUN mkdir -p /data /log /conf
 
-RUN mkdir -p /data /log
+VOLUME ["/data", "/log", "/conf"]
 
-VOLUME ["/data", "/log"]
+ADD elasticsearch/elasticsearch.yml /conf/elasticsearch.yml
+ADD elasticsearch/logging.yml /conf/logging.yml
+ADD logstash/logstash.conf /conf/logstash.conf
 
-EXPOSE 9200 9300
+
+EXPOSE 9200 9300 9292
 
 CMD /usr/bin/supervisord
