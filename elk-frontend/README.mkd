@@ -1,0 +1,9 @@
+This docker image contains 
+
+* Elasticsearch
+* Logstash (w/ Kibana)
+
+*This images are still EXPERIMENTAL.*
+
+So almost configurations cannot be overridden now.
+
