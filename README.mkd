@@ -1,9 +1,46 @@
-This docker image contains 
+ELK-Docker container
+=====
 
-* Elasticsearch
-* Logstash (w/ Kibana)
+About
+-------
 
-*This images are still EXPERIMENTAL.*
+This docker image contains ELK(Elasticseach, Logstash, Kibana) services.
 
-So almost configurations cannot be overridden now.
+* Elasticsearch & Logstash & Rsyslog - for Backend
+* Kibana - for Frontend
 
+
+Backend
+-------
+
+`elk-backend` contains Elasticsearch master and Logstash.
+Logstash 
+
+Exposes ports...
+
+* 9200 : for web API
+* 9300 : for clustering
+* 514 : for receiving syslog
+
+_caveat_
+
+This image doesn't support Elasticsearch cluster now.
+
+### Example
+
+    docker run -d --name es -P elk-backend
+
+Frontend
+--------
+
+Exposes ports...
+
+* 5601 : for WebUI
+
+Required links...
+
+* es : as Elasticsearch
+
+### Example
+
+    docker run -d --name kibana --link es:es -P elk-frontend

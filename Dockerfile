@@ -1,44 +1,26 @@
 FROM centos:7
 MAINTAINER Imamura Yutaka <ilyaletre@gmail.com>
 
-ENV JDK_VERSION="1.7.0"
-ENV ES_VERSION="1.5.1"
-ENV LOGSTASH_VERSION="1.4.2"
+ENV PLATFORM="linux-x64"
+ENV KIBANA_VERSION="4.0.2"
 
-RUN rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-RUN yum -y update && \
-    yum install -y java-${JDK_VERSION}-openjdk tar supervisor python-setuptools && \
-    easy_install supervisor && \
-    yum clean all
-
+RUN yum install -y tar && \
+    yum clean all && \
+    mkdir -p /data /log /conf
 
 WORKDIR /var/lib
 
-RUN curl -s -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
-RUN tar xzf elasticsearch-${ES_VERSION}.tar.gz
-RUN rm -f elasticsearch-${ES_VERSION}.tar.gz
-RUN mv elasticsearch-${ES_VERSION} elasticsearch
-
-RUN curl -s -O https://download.elasticsearch.org/logstash/logstash/logstash-${LOGSTASH_VERSION}.tar.gz
-RUN tar xzf logstash-${LOGSTASH_VERSION}.tar.gz
-RUN rm -f logstash-${LOGSTASH_VERSION}.tar.gz
-RUN mv logstash-${LOGSTASH_VERSION} logstash
+RUN curl -s -O https://download.elastic.co/kibana/kibana/kibana-${KIBANA_VERSION}-${PLATFORM}.tar.gz && \
+    tar xzf kibana-${KIBANA_VERSION}-${PLATFORM}.tar.gz && \
+    rm -f kibana-${KIBANA_VERSION}-${PLATFORM}.tar.gz && \
+    mv kibana-${KIBANA_VERSION}-${PLATFORM} kibana
 
 WORKDIR /
 
-ADD supervisord.conf /etc/supervisord.conf
-RUN mkdir -p /etc/supervisor/conf.d
-ADD elk.conf /etc/supervisor/conf.d/elk.conf
+VOLUME [""/log", "/conf"]
 
-RUN mkdir -p /data /log /conf
+ADD kibana.yml /var/lib/kibana/config/kibana.yml
 
-VOLUME ["/data", "/log", "/conf"]
+EXPOSE 5601
 
-ADD elasticsearch/elasticsearch.yml /conf/elasticsearch.yml
-ADD elasticsearch/logging.yml /conf/logging.yml
-ADD logstash/logstash.conf /conf/logstash.conf
-
-
-EXPOSE 9200 9300 9292
-
-CMD /usr/bin/supervisord
+CMD /var/lib/kibana/bin/kibana
