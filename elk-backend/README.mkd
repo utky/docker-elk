@@ -1,0 +1,6 @@
+A backend container using Elasticsearch, Logstash and Kibana.
+
+
+## Default input
+
+* syslog
